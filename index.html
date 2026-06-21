@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Iso Yawi YouTube Download Tool</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,sans-serif;
+}
+
+body{
+    background:#111827;
+    color:#fff;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+
+.container{
+    width:420px;
+    background:#1f2937;
+    padding:25px;
+    border-radius:10px;
+    box-shadow:0 0 20px rgba(0,0,0,.4);
+}
+
+h1{
+    text-align:center;
+    margin-bottom:20px;
+    color:#ff4444;
+    font-size:26px;
+}
+
+input{
+    width:100%;
+    padding:12px;
+    border:none;
+    border-radius:6px;
+    font-size:15px;
+    margin-bottom:15px;
+}
+
+button{
+    width:100%;
+    padding:12px;
+    border:none;
+    border-radius:6px;
+    background:#ff0000;
+    color:white;
+    cursor:pointer;
+    font-size:16px;
+    font-weight:bold;
+}
+
+button:hover{
+    background:#d60000;
+}
+
+#result{
+    margin-top:20px;
+    line-height:1.8;
+}
+
+a{
+    color:#4fc3ff;
+    text-decoration:none;
+}
+
+a:hover{
+    text-decoration:underline;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Iso Yawi YouTube Download Tool</h1>
+
+<input
+id="url"
+type="text"
+placeholder="Paste YouTube video link">
+
+<button onclick="searchVideo()">
+Search
+</button>
+
+<div id="result"></div>
+
+</div>
+
+<script>
+function searchVideo(){
+
+    const url=document.getElementById("url").value.trim();
+
+    const match=url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&?#]+)/);
+
+    if(!match){
+        document.getElementById("result").innerHTML=
+        "<p>❌ Invalid YouTube URL.</p>";
+        return;
+    }
+
+    const id=match[1];
+
+    document.getElementById("result").innerHTML=`
+        <p><strong>Video ID:</strong> ${id}</p>
+
+        <p>
+            <a href="https://www.youtube.com/watch?v=${id}" target="_blank">
+                ▶ Open Video on YouTube
+            </a>
+        </p>
+
+        <p>This demo validates the URL and extracts the video ID. It does not generate download links.</p>
+    `;
+}
+</script>
+
+</body>
+</html>
