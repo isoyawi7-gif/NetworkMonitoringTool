@@ -14,7 +14,14 @@ font-family:Arial,sans-serif;
 }
 
 body{
-background:#f4f6f9;
+background:
+linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
+url('indexbackground.png');
+background-size:cover;
+background-position:center;
+background-repeat:no-repeat;
+background-attachment:fixed;
+
 display:flex;
 justify-content:center;
 align-items:center;
@@ -23,11 +30,12 @@ height:100vh;
 
 .login-box{
 width:400px;
-background:#fff;
+background:rgba(255,255,255,0.95);
 padding:30px;
 border-radius:10px;
-box-shadow:0 0 10px rgba(0,0,0,.2);
+box-shadow:0 0 20px rgba(0,0,0,.4);
 text-align:center;
+backdrop-filter:blur(5px);
 }
 
 .logo{
