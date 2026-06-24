@@ -165,7 +165,6 @@ Logout
 <h3>Add Outage Record</h3>
 
 <input type="date" id="date">
-
 <input type="text" id="site" placeholder="Site Name">
 
 <select id="type">
@@ -187,8 +186,12 @@ Logout
 
 <input type="number" id="duration" placeholder="Duration Hours">
 
-<button onclick="addRecord()">Save Record</button>
+<!-- NEW FIELDS -->
+<input type="text" id="rca" placeholder="Root Cause Analysis (RCA)">
+<input type="text" id="solution" placeholder="Solution Applied">
+<input type="text" id="comment" placeholder="Comments">
 
+<button onclick="addRecord()">Save Record</button>
 <button onclick="exportCSV()">Export CSV</button>
 
 </div>
@@ -202,13 +205,16 @@ Logout
 <th>Type</th>
 <th>Cause</th>
 <th>Duration</th>
+<th>RCA</th>
+<th>Solution</th>
+<th>Comments</th>
+<th>Actions</th>
 </tr>
 </thead>
 
 <tbody></tbody>
 
 </table>
-
 <div class="chart-box">
 <h3>Outage Cause Analysis</h3>
 <canvas id="pieChart"></canvas>
@@ -226,44 +232,71 @@ Logout
 </footer>
 
 <script>
+let records = JSON.parse(localStorage.getItem("records")) || [];
 
-let records=JSON.parse(localStorage.getItem("records"))||[];
+let editIndex = -1;
 
-function addRecord(){
+function addRecord() {
 
-let data={
-date:date.value,
-site:site.value,
-type:type.value,
-cause:cause.value,
-duration:duration.value
+let data = {
+date: date.value,
+site: site.value,
+type: type.value,
+cause: cause.value,
+duration: duration.value,
+rca: rca.value,
+solution: solution.value,
+comment: comment.value
 };
 
+if(editIndex === -1){
 records.push(data);
+}else{
+records[editIndex] = data;
+editIndex = -1;
+}
 
-localStorage.setItem("records",JSON.stringify(records));
+localStorage.setItem("records", JSON.stringify(records));
 
+clearForm();
 loadTable();
 updateCharts();
 updateKPIs();
+}
 
+function clearForm(){
+date.value = "";
+site.value = "";
+type.value = "Network";
+cause.value = "Commercial Power Failure";
+duration.value = "";
+rca.value = "";
+solution.value = "";
+comment.value = "";
 }
 
 function loadTable(){
 
-let tbody=document.querySelector("#recordsTable tbody");
+let tbody = document.querySelector("#recordsTable tbody");
+tbody.innerHTML = "";
 
-tbody.innerHTML="";
+records.forEach((r, index) => {
 
-records.forEach(r=>{
-
-tbody.innerHTML+=`
+tbody.innerHTML += `
 <tr>
 <td>${r.date}</td>
 <td>${r.site}</td>
 <td>${r.type}</td>
 <td>${r.cause}</td>
 <td>${r.duration}</td>
+<td>${r.rca || ""}</td>
+<td>${r.solution || ""}</td>
+<td>${r.comment || ""}</td>
+
+<td>
+<button onclick="editRecord(${index})">Edit</button>
+<button onclick="deleteRecord(${index})" style="background:#444;">Delete</button>
+</td>
 </tr>
 `;
 
@@ -271,18 +304,48 @@ tbody.innerHTML+=`
 
 }
 
+function editRecord(index){
+
+let r = records[index];
+
+date.value = r.date;
+site.value = r.site;
+type.value = r.type;
+cause.value = r.cause;
+duration.value = r.duration;
+rca.value = r.rca;
+solution.value = r.solution;
+comment.value = r.comment;
+
+editIndex = index;
+}
+
+function deleteRecord(index){
+
+if(confirm("Delete this record?")){
+
+records.splice(index, 1);
+localStorage.setItem("records", JSON.stringify(records));
+
+loadTable();
+updateCharts();
+updateKPIs();
+}
+
+}
+
 function updateKPIs(){
 
-document.getElementById('totalOutages').innerHTML=records.length;
+document.getElementById('totalOutages').innerHTML = records.length;
 
-document.getElementById('networkOutages').innerHTML=
-records.filter(x=>x.type==="Network").length;
+document.getElementById('networkOutages').innerHTML =
+records.filter(x => x.type === "Network").length;
 
-document.getElementById('powerOutages').innerHTML=
-records.filter(x=>x.type==="Power").length;
+document.getElementById('powerOutages').innerHTML =
+records.filter(x => x.type === "Power").length;
 
-document.getElementById('sitesAffected').innerHTML=
-new Set(records.map(x=>x.site)).size;
+document.getElementById('sitesAffected').innerHTML =
+new Set(records.map(x => x.site)).size;
 
 }
 
@@ -291,46 +354,45 @@ let barChart;
 
 function updateCharts(){
 
-let causes={};
+let causes = {};
 
-records.forEach(r=>{
-causes[r.cause]=(causes[r.cause]||0)+1;
+records.forEach(r => {
+causes[r.cause] = (causes[r.cause] || 0) + 1;
 });
 
 if(pieChart) pieChart.destroy();
 
-pieChart=new Chart(document.getElementById('pieChart'),{
-type:'pie',
-data:{
-labels:Object.keys(causes),
-datasets:[{
-data:Object.values(causes)
+pieChart = new Chart(document.getElementById('pieChart'), {
+type: 'pie',
+data: {
+labels: Object.keys(causes),
+datasets: [{
+data: Object.values(causes)
 }]
 }
 });
 
-let weekly={};
+let weekly = {};
 
-records.forEach(r=>{
+records.forEach(r => {
 
-let d=new Date(r.date);
+let d = new Date(r.date);
+let week = Math.ceil(d.getDate() / 7);
 
-let week=Math.ceil(d.getDate()/7);
-
-weekly["Week "+week]=(weekly["Week "+week]||0)+1;
+weekly["Week " + week] = (weekly["Week " + week] || 0) + 1;
 
 });
 
 if(barChart) barChart.destroy();
 
-barChart=new Chart(document.getElementById('barChart'),{
-type:'bar',
-data:{
-labels:Object.keys(weekly),
-datasets:[{
-label:'Outages',
-data:Object.values(weekly),
-backgroundColor:'#e60000'
+barChart = new Chart(document.getElementById('barChart'), {
+type: 'bar',
+data: {
+labels: Object.keys(weekly),
+datasets: [{
+label: 'Outages',
+data: Object.values(weekly),
+backgroundColor: '#e60000'
 }]
 }
 });
@@ -339,99 +401,25 @@ backgroundColor:'#e60000'
 
 function exportCSV(){
 
-let csv="Date,Site,Type,Cause,Duration\n";
+let csv = "Date,Site,Type,Cause,Duration,RCA,Solution,Comments\n";
 
-records.forEach(r=>{
-
-csv+=`${r.date},${r.site},${r.type},${r.cause},${r.duration}\n`;
-
+records.forEach(r => {
+csv += `${r.date},${r.site},${r.type},${r.cause},${r.duration},${r.rca || ""},${r.solution || ""},${r.comment || ""}\n`;
 });
 
-let blob=new Blob([csv],{type:'text/csv'});
+let blob = new Blob([csv], {type:'text/csv'});
+let a = document.createElement('a');
 
-let a=document.createElement('a');
-
-a.href=URL.createObjectURL(blob);
-
-a.download='VodafonePNG_NOC_Report.csv';
-
+a.href = URL.createObjectURL(blob);
+a.download = 'VodafonePNG_NOC_Report.csv';
 a.click();
 
 }
 
+// INIT
 loadTable();
 updateKPIs();
 updateCharts();
-
-</script>
-<script>
-
-if(sessionStorage.getItem("loggedIn") !== "true"){
-
-    document.body.innerHTML = `
-    <div style="
-        display:flex;
-        justify-content:center;
-        align-items:center;
-        height:100vh;
-        background:#f4f6f9;
-        font-family:Arial,sans-serif;
-    ">
-        <div style="
-            background:white;
-            padding:40px;
-            border-radius:10px;
-            text-align:center;
-            box-shadow:0 0 15px rgba(0,0,0,.2);
-        ">
-
-            <img src="vflogo.png" style="height:80px;"><br><br>
-
-            <h1 style="color:red;">ACCESS DENIED</h1>
-
-            <p>
-                You are not authorized to access this page.
-            </p>
-
-            <button onclick="window.location.href='index.html'"
-            style="
-                background:red;
-                color:white;
-                border:none;
-                padding:12px 20px;
-                cursor:pointer;
-                border-radius:5px;
-            ">
-                Return to Login
-            </button>
-
-        </div>
-    </div>
-    `;
-
-    throw new Error("Unauthorized Access");
-
-}
-
-</script>
-<script>
-
-function logout(){
-
-    sessionStorage.clear();
-
-    window.location.href = "index.html";
-window.history.forward();
-
-function noBack(){
-    window.history.forward();
-}
-
-setTimeout(noBack,0);
-window.onunload=function(){};
-
-}
-
 </script>
 </body>
 </html>
