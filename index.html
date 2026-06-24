@@ -76,7 +76,7 @@ color:#666;
 
 <img src="VFlogo.png" class="logo">
 
-<h2>Vodafone PNG Iso Yawi System Portal</h2>
+<h2>Vodafone PNG FE Online Portal</h2>
 
 <input type="text" id="username" placeholder="Username">
 
@@ -90,7 +90,6 @@ color:#666;
 
 </div>
 
-
 <script>
 function login(){
 
@@ -101,18 +100,14 @@ function login(){
 
         sessionStorage.setItem("loggedIn","true");
 
+        // redirect ONLY after successful login
         window.location.href = "netopsdashboard.html";
 
-    }else{
+    } else {
 
         alert("Invalid Username or Password");
-
     }
-
 }
-sessionStorage.setItem("loggedIn","true");
-history.pushState(null,null,"netopsdashboard.html");
-window.location.href="netopsdashboard.html";
 </script>
 
 </body>
