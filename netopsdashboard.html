@@ -339,16 +339,69 @@ stepSize: 1
 
 });
 
-if(barChart) barChart.destroy();
+barChart = new Chart(document.getElementById("barChart"), {
 
-barChart=new Chart(document.getElementById("barChart"),{
-type:"bar",
-data:{
-labels:Object.keys(weekly),
-datasets:[{data:Object.values(weekly),backgroundColor:"#e60000"}]
+type: "bar",
+
+data: {
+labels: Object.keys(siteOutages),
+
+datasets: [{
+label: "Number of Outages",
+data: Object.values(siteOutages),
+backgroundColor: "#e60000"
+}]
+},
+
+options: {
+
+responsive: true,
+
+plugins: {
+legend: {
+display: true
 }
+},
+
+scales: {
+
+x: {
+title: {
+display: true,
+text: "Site Name"
+}
+},
+
+y: {
+beginAtZero: true,
+title: {
+display: true,
+text: "Outage Count"
+},
+ticks: {
+stepSize: 1
+}
+}
+
+}
+
+}
+
 });
+
 }
+
+records.forEach(r => {
+
+const site = r.siteName || "Unknown Site";
+
+if(!siteOutages[site]){
+siteOutages[site] = 0;
+}
+
+siteOutages[site]++;
+
+});
 
 function exportCSV(){
 let csv="Date,SiteID,SiteName,Type,Cause,Duration,RCA,Solution,Comments\n";
