@@ -271,10 +271,72 @@ data:{labels:Object.keys(causes),
 datasets:[{data:Object.values(causes)}]}
 });
 
-let weekly={};
-records.forEach(r=>{
-let w=Math.ceil(new Date(r.date).getDate()/7);
-weekly["Week "+w]=(weekly["Week "+w]||0)+1;
+// SITE OUTAGE COUNT
+
+let siteOutages = {};
+
+records.forEach(r => {
+
+if(!siteOutages[r.siteName]){
+siteOutages[r.siteName] = 0;
+}
+
+siteOutages[r.siteName]++;
+
+});
+
+if(barChart) barChart.destroy();
+
+barChart = new Chart(document.getElementById("barChart"), {
+
+type: "bar",
+
+data: {
+
+labels: Object.keys(siteOutages),
+
+datasets: [{
+label: "Number of Outages",
+data: Object.values(siteOutages),
+backgroundColor: "#e60000"
+}]
+
+},
+
+options: {
+
+responsive: true,
+
+plugins: {
+legend: {
+display: true
+}
+},
+
+scales: {
+
+x: {
+title: {
+display: true,
+text: "Site Name"
+}
+},
+
+y: {
+beginAtZero: true,
+title: {
+display: true,
+text: "Outage Count"
+},
+ticks: {
+stepSize: 1
+}
+}
+
+}
+
+}
+
 });
 
 if(barChart) barChart.destroy();
