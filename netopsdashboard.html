@@ -1,1 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
 
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Vodafone PNG Network Operations Dashboard</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+*{
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+margin:0;
+background:#f4f6f9;
+}
+
+header{
+background:#e60000;
+color:white;
+padding:15px;
+display:flex;
+align-items:center;
+gap:15px;
+}
+
+header img{
+height:60px;
+}
+
+.container{
+padding:20px;
+}
+
+.cards{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+gap:15px;
+margin-bottom:20px;
+}
+
+.card{
+background:white;
+padding:20px;
+border-radius:10px;
+box-shadow:0 2px 5px rgba(0,0,0,.1);
+text-align:center;
+}
+
+.form-box{
+background:white;
+padding:20px;
+border-radius:10px;
+margin-bottom:20px;
+}
+
+input,select{
+padding:10px;
+margin:5px;
+border:1px solid #ccc;
+border-radius:5px;
+}
+
+button{
+padding:10px 15px;
+background:#e60000;
+color:white;
+border:none;
+border-radius:5px;
+cursor:pointer;
+}
+
+button:hover{
+background:#b30000;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+background:white;
+}
+
+table th,table td{
+border:1px solid #ddd;
+padding:10px;
+}
+
+table th{
+background:#e60000;
+color:white;
+}
+
+.chart-box{
+background:white;
+padding:20px;
+margin-top:20px;
+border-radius:10px;
+}
+
+footer{
+margin-top:30px;
+background:#222;
+color:white;
+text-align:center;
+padding:15px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+<img src="vflogo.png">
+<div>
+<h2>Vodafone PNG Iso Yawi Network Monitoring and Report Generation Tool</h2>
+<p>Network & Power Monitoring Dashboard</p>
+</div>
+</header>
+
+<div class="container">
+
+<div class="cards">
+
+<div class="card">
+<h3 id="totalOutages">0</h3>
+<p>Total Outages</p>
+</div>
+
+<div class="card">
+<h3 id="networkOutages">0</h3>
+<p>Network Outages</p>
+</div>
+
+<div class="card">
+<h3 id="powerOutages">0</h3>
+<p>Power Outages</p>
+</div>
+
+<div class="card">
+<h3 id="sitesAffected">0</h3>
+<p>Sites Affected</p>
+</div>
+
+</div>
+
+<div class="form-box">
+
+<h3>Add Outage Record</h3>
+
+<input type="date" id="date">
+
+<input type="text" id="site" placeholder="Site Name">
+
+<select id="type">
+<option>Network</option>
+<option>Power</option>
+<option>Transmission</option>
+</select>
+
+<select id="cause">
+<option>Commercial Power Failure</option>
+<option>Generator Failure</option>
+<option>Battery Failure</option>
+<option>Fiber Cut</option>
+<option>Microwave Failure</option>
+<option>Equipment Failure</option>
+<option>Lightning</option>
+<option>Other</option>
+</select>
+
+<input type="number" id="duration" placeholder="Duration Hours">
+
+<button onclick="addRecord()">Save Record</button>
+
+<button onclick="exportCSV()">Export CSV</button>
+
+</div>
+
+<table id="recordsTable">
+
+<thead>
+<tr>
+<th>Date</th>
+<th>Site</th>
+<th>Type</th>
+<th>Cause</th>
+<th>Duration</th>
+</tr>
+</thead>
+
+<tbody></tbody>
+
+</table>
+
+<div class="chart-box">
+<h3>Outage Cause Analysis</h3>
+<canvas id="pieChart"></canvas>
+</div>
+
+<div class="chart-box">
+<h3>Weekly Outages Monitoring</h3>
+<canvas id="barChart"></canvas>
+</div>
+
+</div>
+
+<footer>
+© 2026 Vodafone PNG NOC Dashboard | Iso Yawi System Creator
+</footer>
+
+<script>
+
+let records=JSON.parse(localStorage.getItem("records"))||[];
+
+function addRecord(){
+
+let data={
+date:date.value,
+site:site.value,
+type:type.value,
+cause:cause.value,
+duration:duration.value
+};
+
+records.push(data);
+
+localStorage.setItem("records",JSON.stringify(records));
+
+loadTable();
+updateCharts();
+updateKPIs();
+
+}
+
+function loadTable(){
+
+let tbody=document.querySelector("#recordsTable tbody");
+
+tbody.innerHTML="";
+
+records.forEach(r=>{
+
+tbody.innerHTML+=`
+<tr>
+<td>${r.date}</td>
+<td>${r.site}</td>
+<td>${r.type}</td>
+<td>${r.cause}</td>
+<td>${r.duration}</td>
+</tr>
+`;
+
+});
+
+}
+
+function updateKPIs(){
+
+document.getElementById('totalOutages').innerHTML=records.length;
+
+document.getElementById('networkOutages').innerHTML=
+records.filter(x=>x.type==="Network").length;
+
+document.getElementById('powerOutages').innerHTML=
+records.filter(x=>x.type==="Power").length;
+
+document.getElementById('sitesAffected').innerHTML=
+new Set(records.map(x=>x.site)).size;
+
+}
+
+let pieChart;
+let barChart;
+
+function updateCharts(){
+
+let causes={};
+
+records.forEach(r=>{
+causes[r.cause]=(causes[r.cause]||0)+1;
+});
+
+if(pieChart) pieChart.destroy();
+
+pieChart=new Chart(document.getElementById('pieChart'),{
+type:'pie',
+data:{
+labels:Object.keys(causes),
+datasets:[{
+data:Object.values(causes)
+}]
+}
+});
+
+let weekly={};
+
+records.forEach(r=>{
+
+let d=new Date(r.date);
+
+let week=Math.ceil(d.getDate()/7);
+
+weekly["Week "+week]=(weekly["Week "+week]||0)+1;
+
+});
+
+if(barChart) barChart.destroy();
+
+barChart=new Chart(document.getElementById('barChart'),{
+type:'bar',
+data:{
+labels:Object.keys(weekly),
+datasets:[{
+label:'Outages',
+data:Object.values(weekly),
+backgroundColor:'#e60000'
+}]
+}
+});
+
+}
+
+function exportCSV(){
+
+let csv="Date,Site,Type,Cause,Duration\n";
+
+records.forEach(r=>{
+
+csv+=`${r.date},${r.site},${r.type},${r.cause},${r.duration}\n`;
+
+});
+
+let blob=new Blob([csv],{type:'text/csv'});
+
+let a=document.createElement('a');
+
+a.href=URL.createObjectURL(blob);
+
+a.download='VodafonePNG_NOC_Report.csv';
+
+a.click();
+
+}
+
+loadTable();
+updateKPIs();
+updateCharts();
+
+</script>
+
+</body>
+</html>
