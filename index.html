@@ -110,6 +110,9 @@ function login(){
     }
 
 }
+sessionStorage.setItem("loggedIn","true");
+history.pushState(null,null,"dashboard.html");
+window.location.href="dashboard.html";
 </script>
 
 </body>
