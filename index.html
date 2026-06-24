@@ -3,299 +3,107 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vodafone PNG - NOC & Power Monitoring</title>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<title>Vodafone PNG NetworkTool</title>
 
 <style>
-body{
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
 font-family:Arial,sans-serif;
-margin:20px;
+}
+
+body{
 background:#f4f6f9;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
 }
 
-h1{
-text-align:center;
-color:#c00000;
-}
-
-.container{
+.login-box{
+width:400px;
 background:#fff;
-padding:20px;
+padding:30px;
 border-radius:10px;
-box-shadow:0 2px 8px rgba(0,0,0,.1);
+box-shadow:0 0 10px rgba(0,0,0,.2);
+text-align:center;
+}
+
+.logo{
+width:120px;
+margin-bottom:15px;
+}
+
+h2{
+color:#e60000;
 margin-bottom:20px;
 }
 
-input,select{
-padding:8px;
-margin:5px;
-width:180px;
-}
-
-button{
-padding:10px 15px;
-background:#c00000;
-color:white;
-border:none;
-cursor:pointer;
+input{
+width:100%;
+padding:12px;
+margin:10px 0;
+border:1px solid #ccc;
 border-radius:5px;
 }
 
-button:hover{
-background:#900;
-}
-
-table{
+button{
 width:100%;
-border-collapse:collapse;
-margin-top:15px;
+padding:12px;
+background:#e60000;
+color:#fff;
+border:none;
+border-radius:5px;
+cursor:pointer;
 }
 
-table th, table td{
-border:1px solid #ccc;
-padding:8px;
-text-align:left;
+button:hover{
+background:#b30000;
 }
 
-canvas{
-max-width:600px;
-margin:auto;
-display:block;
+.footer{
+margin-top:20px;
+font-size:12px;
+color:#666;
 }
 </style>
 </head>
 
 <body>
 
-<h1>Vodafone PNG - Iso Yawi private monitoring /h1>
+<div class="login-box">
 
-<div class="container">
-<h2>Add Outage Record</h2>
+<img src="VFlogo.png" class="logo">
 
-<input type="date" id="date">
+<h2>Vodafone PNG Iso Yawi System Portal</h2>
 
-<input type="text" id="site" placeholder="Site Name">
+<input type="text" id="username" placeholder="Username">
 
-<select id="type">
-<option>Network</option>
-<option>Power</option>
-<option>Transmission</option>
-</select>
+<input type="password" id="password" placeholder="Password">
 
-<select id="cause">
-<option>Commercial Power Failure</option>
-<option>Generator Failure</option>
-<option>Battery Failure</option>
-<option>Fiber Cut</option>
-<option>Microwave Failure</option>
-<option>Equipment Failure</option>
-<option>Lightning</option>
-<option>Other</option>
-</select>
+<button onclick="login()">Login</button>
 
-<input type="number" id="duration" placeholder="Duration (hrs)">
-
-<button onclick="addRecord()">Add Record</button>
-<button onclick="exportCSV()">Export Excel CSV</button>
-
+<div class="footer">
+2026 © Iso Yawi System Creator
 </div>
 
-<div class="container">
-<h2>Outage Records</h2>
-
-<table id="recordsTable">
-<thead>
-<tr>
-<th>Date</th>
-<th>Site</th>
-<th>Type</th>
-<th>Cause</th>
-<th>Duration</th>
-</tr>
-</thead>
-<tbody></tbody>
-</table>
-
-</div>
-
-<div class="container">
-<h2>Outage Cause Analysis</h2>
-<canvas id="pieChart"></canvas>
-</div>
-
-<div class="container">
-<h2>Weekly Outages</h2>
-<canvas id="barChart"></canvas>
 </div>
 
 <script>
 
-let records = JSON.parse(localStorage.getItem("nocRecords")) || [];
+function login(){
 
-function saveData(){
-localStorage.setItem("nocRecords",JSON.stringify(records));
+let user=document.getElementById('username').value;
+let pass=document.getElementById('password').value;
+
+if(user==="admin" && pass==="admin123"){
+window.location='netopsdashborad.html';
+}else{
+alert("Invalid Login");
 }
 
-function addRecord(){
-
-const record = {
-date:document.getElementById("date").value,
-site:document.getElementById("site").value,
-type:document.getElementById("type").value,
-cause:document.getElementById("cause").value,
-duration:document.getElementById("duration").value
-};
-
-records.push(record);
-
-saveData();
-renderTable();
-updateCharts();
-
 }
-
-function renderTable(){
-
-const tbody =
-document.querySelector("#recordsTable tbody");
-
-tbody.innerHTML="";
-
-records.forEach(r=>{
-
-tbody.innerHTML += `
-<tr>
-<td>${r.date}</td>
-<td>${r.site}</td>
-<td>${r.type}</td>
-<td>${r.cause}</td>
-<td>${r.duration}</td>
-</tr>
-`;
-
-});
-
-}
-
-let pieChart;
-let barChart;
-
-function updateCharts(){
-
-const causeCounts = {};
-
-records.forEach(r=>{
-causeCounts[r.cause] =
-(causeCounts[r.cause] || 0)+1;
-});
-
-const pieLabels =
-Object.keys(causeCounts);
-
-const pieValues =
-Object.values(causeCounts);
-
-if(pieChart) pieChart.destroy();
-
-pieChart = new Chart(
-document.getElementById("pieChart"),
-{
-type:"pie",
-data:{
-labels:pieLabels,
-datasets:[{
-data:pieValues
-}]
-}
-}
-);
-
-const weekCounts = {};
-
-records.forEach(r=>{
-
-const week =
-r.date
-? new Date(r.date)
-.getWeek()
-: 0;
-
-weekCounts[week] =
-(weekCounts[week] || 0)+1;
-
-});
-
-if(barChart) barChart.destroy();
-
-barChart = new Chart(
-document.getElementById("barChart"),
-{
-type:"bar",
-data:{
-labels:Object.keys(weekCounts),
-datasets:[{
-label:"Outages",
-data:Object.values(weekCounts),
-backgroundColor:"red"
-}]
-}
-}
-);
-
-}
-
-Date.prototype.getWeek = function() {
-const d = new Date(
-Date.UTC(
-this.getFullYear(),
-this.getMonth(),
-this.getDate()
-));
-const dayNum = d.getUTCDay() || 7;
-d.setUTCDate(
-d.getUTCDate() + 4 - dayNum
-);
-const yearStart =
-new Date(
-Date.UTC(d.getUTCFullYear(),0,1)
-);
-return Math.ceil(
-(((d - yearStart)/86400000)+1)/7
-);
-};
-
-function exportCSV(){
-
-let csv =
-"Date,Site,Type,Cause,Duration\n";
-
-records.forEach(r=>{
-
-csv +=
-`${r.date},${r.site},${r.type},${r.cause},${r.duration}\n`;
-
-});
-
-const blob =
-new Blob([csv],
-{type:'text/csv'});
-
-const a =
-document.createElement('a');
-
-a.href =
-URL.createObjectURL(blob);
-
-a.download =
-"Vodafone_PNG_NOC_Report.csv";
-
-a.click();
-
-}
-
-renderTable();
-updateCharts();
 
 </script>
 
