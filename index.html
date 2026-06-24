@@ -90,21 +90,26 @@ color:#666;
 
 </div>
 
-<script>
 
+<script>
 function login(){
 
-let user=document.getElementById('username').value;
-let pass=document.getElementById('password').value;
+    let user = document.getElementById("username").value;
+    let pass = document.getElementById("password").value;
 
-if(user==="admin" && pass==="admin123"){
-window.location='netopsdashborad.html';
-}else{
-alert("Invalid Login");
+    if(user === "admin" && pass === "admin123"){
+
+        sessionStorage.setItem("loggedIn","true");
+
+        window.location.href = "dashboard.html";
+
+    }else{
+
+        alert("Invalid Username or Password");
+
+    }
+
 }
-
-}
-
 </script>
 
 </body>
