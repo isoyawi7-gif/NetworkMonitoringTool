@@ -123,9 +123,13 @@ Logout
 <input type="text" id="rca" placeholder="Root Cause Analysis (RCA)">
 <input type="text" id="solution" placeholder="Solution Applied">
 <input type="text" id="comment" placeholder="Comments">
+<input type="text" id="fieldEngineer" placeholder="Field Engineer / Team Attended">
 
 <button onclick="addRecord()">Save Record</button>
 <button onclick="exportCSV()">Export CSV</button>
+<button onclick="downloadPieChart()">Download Pie Chart</button>
+
+<button onclick="downloadBarChart()">Download Bar Chart</button>
 </div>
 
 <!-- TABLE -->
@@ -179,7 +183,8 @@ cause: document.getElementById("cause").value,
 duration: document.getElementById("duration").value,
 rca: document.getElementById("rca").value,
 solution: document.getElementById("solution").value,
-comment: document.getElementById("comment").value
+comment: document.getElementById("comment").value,
+fieldEngineer: document.getElementById("fieldEngineer").value
 };
 
 if(editIndex === -1){
@@ -223,6 +228,7 @@ tbody.innerHTML += `
 <td>${r.rca}</td>
 <td>${r.solution}</td>
 <td>${r.comment}</td>
+<td>${r.fieldEngineer}</td>
 <td>
 <button onclick="editRecord(${index})">Edit</button>
 <button onclick="deleteRecord(${index})">Delete</button>
@@ -415,16 +421,31 @@ siteOutages[site]++;
 });
 
 function exportCSV(){
-let csv="Date,SiteID,SiteName,Type,Cause,Duration,RCA,Solution,Comments\n";
+
+let engineerName = prompt("Enter Field Engineer Name:");
+
+let csv = "";
+
+csv += "WEEKLY TASK TRACKER\n";
+csv += "Field Engineer," + engineerName + "\n";
+csv += "Generated," + new Date().toLocaleString() + "\n\n";
+
+csv += "Date,SiteID,SiteName,Type,Cause,Duration,RCA,Solution,Comments,Field Engineer / Team Attended\n";
 
 records.forEach(r=>{
-csv+=`${r.date},${r.siteId},${r.siteName},${r.type},${r.cause},${r.duration},${r.rca},${r.solution},${r.comment}\n`;
+
+csv += `${r.date},${r.siteId},${r.siteName},${r.type},${r.cause},${r.duration},${r.rca},${r.solution},${r.comment},${r.fieldEngineer}\n`;
+
 });
 
-let blob=new Blob([csv],{type:"text/csv"});
-let a=document.createElement("a");
-a.href=URL.createObjectURL(blob);
-a.download="NOC_Report.csv";
+let blob = new Blob([csv], {type:"text/csv"});
+
+let a = document.createElement("a");
+
+a.href = URL.createObjectURL(blob);
+
+a.download = "Weekly_Task_Tracker.csv";
+
 a.click();
 }
 
@@ -445,6 +466,33 @@ window.location.href = "index.html";
 }
 
 }
+
+// Download CSV
+
+function downloadPieChart(){
+
+let link = document.createElement("a");
+
+link.download = "Outage_Cause_Analysis.png";
+
+link.href = pieChart.toBase64Image();
+
+link.click();
+
+}
+
+function downloadBarChart(){
+
+let link = document.createElement("a");
+
+link.download = "Site_Outage_Count.png";
+
+link.href = barChart.toBase64Image();
+
+link.click();
+
+}
+
 </script>
 
 </body>
