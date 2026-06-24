@@ -201,7 +201,8 @@ Logout
 <thead>
 <tr>
 <th>Date</th>
-<th>Site</th>
+<th>Site ID</th>
+<th>Site Name</th>
 <th>Type</th>
 <th>Cause</th>
 <th>Duration</th>
@@ -240,7 +241,8 @@ function addRecord() {
 
 let data = {
 date: date.value,
-site: site.value,
+siteid: siteid.value,
+sitename: sitename.value,
 type: type.value,
 cause: cause.value,
 duration: duration.value,
