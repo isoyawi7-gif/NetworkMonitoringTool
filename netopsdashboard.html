@@ -123,6 +123,15 @@ padding:15px;
 <h2>Vodafone PNG Iso Yawi Network Monitoring and Report Generation Tool</h2>
 <p>Network & Power Monitoring Dashboard</p>
 </div>
+
+<button onclick="logout()" style="
+margin-left:auto;
+background:white;
+color:#e60000;
+font-weight:bold;
+">
+Logout
+</button>
 </header>
 
 <div class="container">
@@ -355,6 +364,66 @@ updateKPIs();
 updateCharts();
 
 </script>
+<script>
 
+if(sessionStorage.getItem("loggedIn") !== "true"){
+
+    document.body.innerHTML = `
+    <div style="
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        height:100vh;
+        background:#f4f6f9;
+        font-family:Arial,sans-serif;
+    ">
+        <div style="
+            background:white;
+            padding:40px;
+            border-radius:10px;
+            text-align:center;
+            box-shadow:0 0 15px rgba(0,0,0,.2);
+        ">
+
+            <img src="vflogo.png" style="height:80px;"><br><br>
+
+            <h1 style="color:red;">ACCESS DENIED</h1>
+
+            <p>
+                You are not authorized to access this page.
+            </p>
+
+            <button onclick="window.location.href='index.html'"
+            style="
+                background:red;
+                color:white;
+                border:none;
+                padding:12px 20px;
+                cursor:pointer;
+                border-radius:5px;
+            ">
+                Return to Login
+            </button>
+
+        </div>
+    </div>
+    `;
+
+    throw new Error("Unauthorized Access");
+
+}
+
+</script>
+<script>
+
+function logout(){
+
+    sessionStorage.clear();
+
+    window.location.href = "index.html";
+
+}
+
+</script>
 </body>
 </html>
