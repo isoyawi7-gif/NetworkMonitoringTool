@@ -1,118 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Vodafone PNG Network Operations Dashboard</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-
-*{
-box-sizing:border-box;
-font-family:Arial,sans-serif;
-}
-
-body{
-margin:0;
-background:#f4f6f9;
-}
+*{box-sizing:border-box;font-family:Arial,sans-serif;}
+body{margin:0;background:#f4f6f9;}
 
 header{
-background:#e60000;
-color:white;
-padding:15px;
-display:flex;
-align-items:center;
-gap:15px;
+background:#e60000;color:white;padding:15px;
+display:flex;align-items:center;gap:15px;
 }
 
-header img{
-height:60px;
-}
+header img{height:60px;}
 
-.container{
-padding:20px;
-}
+.container{padding:20px;}
 
 .cards{
 display:grid;
 grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-gap:15px;
-margin-bottom:20px;
+gap:15px;margin-bottom:20px;
 }
 
 .card{
-background:white;
-padding:20px;
-border-radius:10px;
+background:white;padding:20px;border-radius:10px;
 box-shadow:0 2px 5px rgba(0,0,0,.1);
 text-align:center;
 }
 
 .form-box{
-background:white;
-padding:20px;
-border-radius:10px;
-margin-bottom:20px;
+background:white;padding:20px;border-radius:10px;margin-bottom:20px;
 }
 
 input,select{
-padding:10px;
-margin:5px;
-border:1px solid #ccc;
-border-radius:5px;
+padding:10px;margin:5px;border:1px solid #ccc;border-radius:5px;
 }
 
 button{
-padding:10px 15px;
-background:#e60000;
-color:white;
-border:none;
-border-radius:5px;
-cursor:pointer;
+padding:10px 15px;background:#e60000;color:white;
+border:none;border-radius:5px;cursor:pointer;
 }
 
-button:hover{
-background:#b30000;
-}
+button:hover{background:#b30000;}
 
-table{
-width:100%;
-border-collapse:collapse;
-background:white;
-}
-
-table th,table td{
-border:1px solid #ddd;
-padding:10px;
-}
-
-table th{
-background:#e60000;
-color:white;
-}
+table{width:100%;border-collapse:collapse;background:white;}
+table th,table td{border:1px solid #ddd;padding:10px;}
+table th{background:#e60000;color:white;}
 
 .chart-box{
-background:white;
-padding:20px;
-margin-top:20px;
-border-radius:10px;
+background:white;padding:20px;margin-top:20px;border-radius:10px;
 }
 
 footer{
-margin-top:30px;
-background:#222;
-color:white;
-text-align:center;
-padding:15px;
+margin-top:30px;background:#222;color:white;
+text-align:center;padding:15px;
 }
-
 </style>
-
 </head>
 
 <body>
@@ -120,53 +67,28 @@ padding:15px;
 <header>
 <img src="VFlogo.png">
 <div>
-<h2>Vodafone PNG Iso Yawi Network Monitoring and Report Generation Tool</h2>
-<p>Network & Power Monitoring Dashboard</p>
+<h2>Vodafone PNG Network Monitoring Dashboard</h2>
+<p>Network & Power Monitoring System</p>
 </div>
-
-<button onclick="logout()" style="
-margin-left:auto;
-background:white;
-color:#e60000;
-font-weight:bold;
-">
-Logout
-</button>
 </header>
 
 <div class="container">
 
+<!-- KPIs -->
 <div class="cards">
-
-<div class="card">
-<h3 id="totalOutages">0</h3>
-<p>Total Outages</p>
+<div class="card"><h3 id="totalOutages">0</h3><p>Total Outages</p></div>
+<div class="card"><h3 id="networkOutages">0</h3><p>Network Outages</p></div>
+<div class="card"><h3 id="powerOutages">0</h3><p>Power Outages</p></div>
+<div class="card"><h3 id="sitesAffected">0</h3><p>Sites Affected</p></div>
 </div>
 
-<div class="card">
-<h3 id="networkOutages">0</h3>
-<p>Network Outages</p>
-</div>
-
-<div class="card">
-<h3 id="powerOutages">0</h3>
-<p>Power Outages</p>
-</div>
-
-<div class="card">
-<h3 id="sitesAffected">0</h3>
-<p>Sites Affected</p>
-</div>
-
-</div>
-
+<!-- FORM -->
 <div class="form-box">
-
 <h3>Add Outage Record</h3>
 
 <input type="date" id="date">
-<input type="text" id="site" placeholder="Site ID">
-<input type="text" id="site" placeholder="Site Name">
+<input type="text" id="siteId" placeholder="Site ID">
+<input type="text" id="siteName" placeholder="Site Name">
 
 <select id="type">
 <option>Network</option>
@@ -187,18 +109,16 @@ Logout
 
 <input type="number" id="duration" placeholder="Duration Hours">
 
-<!-- NEW FIELDS -->
 <input type="text" id="rca" placeholder="Root Cause Analysis (RCA)">
 <input type="text" id="solution" placeholder="Solution Applied">
 <input type="text" id="comment" placeholder="Comments">
 
 <button onclick="addRecord()">Save Record</button>
 <button onclick="exportCSV()">Export CSV</button>
-
 </div>
 
+<!-- TABLE -->
 <table id="recordsTable">
-
 <thead>
 <tr>
 <th>Date</th>
@@ -213,10 +133,10 @@ Logout
 <th>Actions</th>
 </tr>
 </thead>
-
 <tbody></tbody>
-
 </table>
+
+<!-- CHARTS -->
 <div class="chart-box">
 <h3>Outage Cause Analysis</h3>
 <canvas id="pieChart"></canvas>
@@ -230,26 +150,25 @@ Logout
 </div>
 
 <footer>
-© 2026 Vodafone PNG NOC Dashboard | Iso Yawi System Creator
+© 2026 Vodafone PNG NOC Dashboard
 </footer>
 
 <script>
 let records = JSON.parse(localStorage.getItem("records")) || [];
-
 let editIndex = -1;
 
-function addRecord() {
+function addRecord(){
 
 let data = {
-date: date.value,
-siteid: siteid.value,
-sitename: sitename.value,
-type: type.value,
-cause: cause.value,
-duration: duration.value,
-rca: rca.value,
-solution: solution.value,
-comment: comment.value
+date: document.getElementById("date").value,
+siteId: document.getElementById("siteId").value,
+siteName: document.getElementById("siteName").value,
+type: document.getElementById("type").value,
+cause: document.getElementById("cause").value,
+duration: document.getElementById("duration").value,
+rca: document.getElementById("rca").value,
+solution: document.getElementById("solution").value,
+comment: document.getElementById("comment").value
 };
 
 if(editIndex === -1){
@@ -263,166 +182,130 @@ localStorage.setItem("records", JSON.stringify(records));
 
 clearForm();
 loadTable();
-updateCharts();
 updateKPIs();
+updateCharts();
 }
 
 function clearForm(){
-date.value = "";
-site.value = "";
-type.value = "Network";
-cause.value = "Commercial Power Failure";
-duration.value = "";
-rca.value = "";
-solution.value = "";
-comment.value = "";
+document.getElementById("date").value="";
+document.getElementById("siteId").value="";
+document.getElementById("siteName").value="";
+document.getElementById("duration").value="";
+document.getElementById("rca").value="";
+document.getElementById("solution").value="";
+document.getElementById("comment").value="";
 }
 
 function loadTable(){
-
 let tbody = document.querySelector("#recordsTable tbody");
-tbody.innerHTML = "";
+tbody.innerHTML="";
 
-records.forEach((r, index) => {
-
+records.forEach((r,index)=>{
 tbody.innerHTML += `
 <tr>
 <td>${r.date}</td>
-<td>${r.site}</td>
+<td>${r.siteId}</td>
+<td>${r.siteName}</td>
 <td>${r.type}</td>
 <td>${r.cause}</td>
 <td>${r.duration}</td>
-<td>${r.rca || ""}</td>
-<td>${r.solution || ""}</td>
-<td>${r.comment || ""}</td>
-
+<td>${r.rca}</td>
+<td>${r.solution}</td>
+<td>${r.comment}</td>
 <td>
 <button onclick="editRecord(${index})">Edit</button>
-<button onclick="deleteRecord(${index})" style="background:#444;">Delete</button>
+<button onclick="deleteRecord(${index})">Delete</button>
 </td>
-</tr>
-`;
-
+</tr>`;
 });
-
 }
 
-function editRecord(index){
+function editRecord(i){
+let r = records[i];
 
-let r = records[index];
+document.getElementById("date").value=r.date;
+document.getElementById("siteId").value=r.siteId;
+document.getElementById("siteName").value=r.siteName;
+document.getElementById("type").value=r.type;
+document.getElementById("cause").value=r.cause;
+document.getElementById("duration").value=r.duration;
+document.getElementById("rca").value=r.rca;
+document.getElementById("solution").value=r.solution;
+document.getElementById("comment").value=r.comment;
 
-date.value = r.date;
-site.value = r.site;
-type.value = r.type;
-cause.value = r.cause;
-duration.value = r.duration;
-rca.value = r.rca;
-solution.value = r.solution;
-comment.value = r.comment;
-
-editIndex = index;
+editIndex=i;
 }
 
-function deleteRecord(index){
-
-if(confirm("Delete this record?")){
-
-records.splice(index, 1);
-localStorage.setItem("records", JSON.stringify(records));
-
+function deleteRecord(i){
+records.splice(i,1);
+localStorage.setItem("records",JSON.stringify(records));
 loadTable();
-updateCharts();
 updateKPIs();
-}
-
+updateCharts();
 }
 
 function updateKPIs(){
-
-document.getElementById('totalOutages').innerHTML = records.length;
-
-document.getElementById('networkOutages').innerHTML =
-records.filter(x => x.type === "Network").length;
-
-document.getElementById('powerOutages').innerHTML =
-records.filter(x => x.type === "Power").length;
-
-document.getElementById('sitesAffected').innerHTML =
-new Set(records.map(x => x.site)).size;
-
+document.getElementById("totalOutages").innerText=records.length;
+document.getElementById("networkOutages").innerText=
+records.filter(r=>r.type==="Network").length;
+document.getElementById("powerOutages").innerText=
+records.filter(r=>r.type==="Power").length;
+document.getElementById("sitesAffected").innerText=
+new Set(records.map(r=>r.siteId)).size;
 }
 
-let pieChart;
-let barChart;
+let pieChart,barChart;
 
 function updateCharts(){
 
-let causes = {};
-
-records.forEach(r => {
-causes[r.cause] = (causes[r.cause] || 0) + 1;
+let causes={};
+records.forEach(r=>{
+causes[r.cause]=(causes[r.cause]||0)+1;
 });
 
 if(pieChart) pieChart.destroy();
 
-pieChart = new Chart(document.getElementById('pieChart'), {
-type: 'pie',
-data: {
-labels: Object.keys(causes),
-datasets: [{
-data: Object.values(causes)
-}]
-}
+pieChart=new Chart(document.getElementById("pieChart"),{
+type:"pie",
+data:{labels:Object.keys(causes),
+datasets:[{data:Object.values(causes)}]}
 });
 
-let weekly = {};
-
-records.forEach(r => {
-
-let d = new Date(r.date);
-let week = Math.ceil(d.getDate() / 7);
-
-weekly["Week " + week] = (weekly["Week " + week] || 0) + 1;
-
+let weekly={};
+records.forEach(r=>{
+let w=Math.ceil(new Date(r.date).getDate()/7);
+weekly["Week "+w]=(weekly["Week "+w]||0)+1;
 });
 
 if(barChart) barChart.destroy();
 
-barChart = new Chart(document.getElementById('barChart'), {
-type: 'bar',
-data: {
-labels: Object.keys(weekly),
-datasets: [{
-label: 'Outages',
-data: Object.values(weekly),
-backgroundColor: '#e60000'
-}]
+barChart=new Chart(document.getElementById("barChart"),{
+type:"bar",
+data:{
+labels:Object.keys(weekly),
+datasets:[{data:Object.values(weekly),backgroundColor:"#e60000"}]
 }
 });
-
 }
 
 function exportCSV(){
+let csv="Date,SiteID,SiteName,Type,Cause,Duration,RCA,Solution,Comments\n";
 
-let csv = "Date,Site,Type,Cause,Duration,RCA,Solution,Comments\n";
-
-records.forEach(r => {
-csv += `${r.date},${r.site},${r.type},${r.cause},${r.duration},${r.rca || ""},${r.solution || ""},${r.comment || ""}\n`;
+records.forEach(r=>{
+csv+=`${r.date},${r.siteId},${r.siteName},${r.type},${r.cause},${r.duration},${r.rca},${r.solution},${r.comment}\n`;
 });
 
-let blob = new Blob([csv], {type:'text/csv'});
-let a = document.createElement('a');
-
-a.href = URL.createObjectURL(blob);
-a.download = 'VodafonePNG_NOC_Report.csv';
+let blob=new Blob([csv],{type:"text/csv"});
+let a=document.createElement("a");
+a.href=URL.createObjectURL(blob);
+a.download="NOC_Report.csv";
 a.click();
-
 }
 
-// INIT
 loadTable();
 updateKPIs();
 updateCharts();
 </script>
+
 </body>
 </html>
